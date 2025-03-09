@@ -95,11 +95,21 @@
     <button onclick="authorize(document.getElementById('token2').value)">Авторизоваться</button>
     <br>
     <label>
+        Начальный ID: <input type="number" id="start_user_id">
+    </label>
+    <label>
+        Конечный ID: <input type="number" id="end_user_id">
+    </label>
+    <button onclick="searchUsersInRange()">Поиск пользователей в диапазоне</button>
+    <br>
+    <label>
         ID пользователя: <input type="number" id="find_user_id">
     </label>
     <button onclick="searchUser(document.getElementById('find_user_id').value)">Поиск информации о пользователе</button>
     <button onclick="document.getElementById('find_user_id').value--; searchUser(document.getElementById('find_user_id').value)">-</button>
     <button onclick="document.getElementById('find_user_id').value++; searchUser(document.getElementById('find_user_id').value)">+</button>
+    <br>
+    <button onclick="clearTableUser()">Очистить таблицу</button>
     <table id="userTable">
         <thead>
         <tr>
@@ -232,11 +242,50 @@
         }
     }
 
-    function searchUser(userId) {
-        clearTableUser();
-        if (window.authorized) {
-            sendMessage('get_user_info{"id": '+userId+'}');
+    function searchUsersInRange() {
+        const startId = parseInt(document.getElementById('start_user_id').value);
+        const endId = parseInt(document.getElementById('end_user_id').value);
+
+        if (isNaN(startId) || isNaN(endId)) {
+            alert("Пожалуйста, введите корректные значения для начального и конечного ID.");
+            return;
         }
+
+        if (startId > endId) {
+            alert("Начальный ID должен быть меньше или равен конечному ID.");
+            return;
+        }
+        let timeout = 0;
+        for (let userId = startId; userId <= endId; userId++) {
+            timeout += 100;
+            setTimeout(() => {
+                searchUser(userId);
+                
+            }, timeout);
+        }
+    }
+
+    function searchUser(userId) {
+        if (window.authorized) {
+            sendMessage('get_user_info{"id": ' + userId + '}');
+        }
+    }
+
+    function addUserToTable(user) {
+        const tableBody = document.querySelector("#userTable tbody");
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.name}</td>
+        <td><img src="${user.avatar}" alt="Avatar" width="50"></td>
+        <td>${user.wins}</td>
+        <td>${user.points_win}</td>
+        <td>${user.score}</td>
+        <td>${new Date(user.dtp).toLocaleString()}</td>
+    `;
+
+        tableBody.appendChild(row);
     }
 
     function closeConnection() {
@@ -313,23 +362,6 @@
         cell7.textContent = kind;
         cell8.textContent = isNew;
         cell8.classList.add(isNew);
-    }
-
-    function addUserToTable(user) {
-        const tableBody = document.querySelector("#userTable tbody");
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.name}</td>
-                <td><img src="${user.avatar}" alt="Avatar" width="50"></td>
-                <td>${user.wins}</td>
-                <td>${user.points_win}</td>
-                <td>${user.score}</td>
-                <td>${new Date(user.dtp).toLocaleString()}</td>
-            `;
-
-        tableBody.appendChild(row);
     }
 </script>
 </body>
