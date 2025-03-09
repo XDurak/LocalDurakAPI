@@ -1,271 +1,336 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LocalDurakAPI</title>
-  <style>
-    .mode-content {
-      display: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalDurakAPI</title>
+    <style>
+        .mode-content {
+            display: none;
+        }
 
-    .mode-content.active {
-      display: block;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-    td {
-      background-color: #f9f9f9;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        .mode-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 </head>
 <body>
 <label>
-  <input type="radio" name="mode" value="mode1" checked> Получение информации об аккаунте
+    <input type="radio" name="mode" value="mode1" checked> Получение информации об аккаунте
 </label>
 <br>
 <label>
-  <input type="radio" name="mode" value="mode2"> Поиск пользователей
+    <input type="radio" name="mode" value="mode2"> Поиск пользователей
 </label>
 
 
 <div id="mode1" class="mode-content active">
-  <h3>Получение информации об аккаунте</h3>
-  <label>
-    Токен: <input id="token" type="text" placeholder="$2a$06$...">
-  </label>
-  <button onclick="authorize(document.getElementById('token').value)">Поиск</button>
-  <p>Информация об аккаунте</p>
-  <table id="dataTableAccount">
-    <thead>
-    <tr>
-      <th>Ключ</th>
-      <th>Значение</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- Данные будут добавляться сюда -->
-    </tbody>
-  </table>
-  <p>Информация о друзьях</p>
-  <table id="dataTableFriends">
-    <thead>
-    <tr>
-      <th>user_id</th>
-      <th>name</th>
-      <th>avatar</th>
-      <th>frame</th>
-      <th>score</th>
-      <th>achieve</th>
-      <th>kind</th>
-      <th>new</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- Данные будут добавляться сюда -->
-    </tbody>
-  </table>
+    <h3>Получение информации об аккаунте</h3>
+    <label>
+        Токен: <input id="token" type="text" placeholder="$2a$06$...">
+    </label>
+    <button onclick="authorize(document.getElementById('token').value)">Поиск</button>
+    <p>Информация об аккаунте</p>
+    <table id="dataTableAccount">
+        <thead>
+        <tr>
+            <th>Ключ</th>
+            <th>Значение</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Данные будут добавляться сюда -->
+        </tbody>
+    </table>
+    <p>Информация о друзьях</p>
+    <table id="dataTableFriends">
+        <thead>
+        <tr>
+            <th>user_id</th>
+            <th>name</th>
+            <th>avatar</th>
+            <th>frame</th>
+            <th>score</th>
+            <th>achieve</th>
+            <th>kind</th>
+            <th>new</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Данные будут добавляться сюда -->
+        </tbody>
+    </table>
 </div>
 <div id="mode2" class="mode-content">
-  <h3>WIP</h3>
-  <p>WIP</p>
+    <h3>Получение информации о пользователе по id</h3>
+    <p>Требуется авторизация в аккаунте</p>
+    <label>
+        Токен: <input id="token2" type="text" placeholder="$2a$06$...">
+    </label>
+    <button onclick="authorize(document.getElementById('token2').value)">Авторизоваться</button>
+    <br>
+    <label>
+        ID пользователя: <input type="number" id="find_user_id">
+    </label>
+    <button onclick="searchUser(document.getElementById('find_user_id').value)">Поиск информации о пользователе</button>
+    <button onclick="document.getElementById('find_user_id').value--; searchUser(document.getElementById('find_user_id').value)">-</button>
+    <button onclick="document.getElementById('find_user_id').value++; searchUser(document.getElementById('find_user_id').value)">+</button>
+    <table id="userTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Avatar</th>
+            <th>Wins</th>
+            <th>Points Win</th>
+            <th>Score</th>
+            <th>Time Registration</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Данные будут добавлены с помощью JavaScript -->
+        </tbody>
+    </table>
 </div>
 
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const radioButtons = document.querySelectorAll('input[name="mode"]');
-    const modeContents = document.querySelectorAll('.mode-content');
+    document.addEventListener("DOMContentLoaded", function () {
+        const radioButtons = document.querySelectorAll('input[name="mode"]');
+        const modeContents = document.querySelectorAll('.mode-content');
 
-    function updateVisibility() {
-      modeContents.forEach(content => content.classList.remove('active'));
-      const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-      document.getElementById(selectedMode).classList.add('active');
-    }
+        function updateVisibility() {
+            modeContents.forEach(content => content.classList.remove('active'));
+            const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+            document.getElementById(selectedMode).classList.add('active');
+        }
 
-    radioButtons.forEach(radio => {
-      radio.addEventListener("change", updateVisibility);
+        radioButtons.forEach(radio => {
+            radio.addEventListener("change", updateVisibility);
+        });
+
+        updateVisibility(); // Установить начальное состояние
     });
-
-    updateVisibility(); // Установить начальное состояние
-  });
 </script>
 <script>
-  function generateAndroidHash(signKey) {
-    const hash = CryptoJS.MD5(signKey + "kdusyfngbfydtsttstcnsjsjdflflfl");
-    return CryptoJS.enc.Base64.stringify(hash);
-  }
-  function connect(){
-    window.socket = new WebSocket('wss://durak-replica.rstgames.com/ws3');
-    window.socket.onopen = function () {
-      console.log("Соединение установлено");
-      sendMessage("c{\"tz\":\"+00:00\", \"t\":\""+new Date().toISOString()+"\", \"l\":\"ru\", \"p\":14, \"pl\":\"web\", \"d\":\"web\", \"v\":\"1.9.8\", \"n\":\"durak.web\"}")
-
-    };
-
-    window.socket.onmessage = function (event) {
-      console.log("Получено сообщение:", event.data);
-      const decodedData = event.data
-      const packets = decodedData.split("\n");
-
-      for (let packet of packets) {
-        let key = packet;
-        let jsonData = null;
-        const jsonIndex = packet.indexOf("{");
-
-        if (jsonIndex !== -1) {
-          key = packet.substring(0, jsonIndex);
-          try {
-            jsonData = JSON.parse(packet.substring(jsonIndex));
-          } catch (error) {
-            console.error("Ошибка с загрузкой JSON");
-            return;
-          }
-        }
-        if (key === "sign"){
-          sendMessage('sign{"hash":"'+generateAndroidHash(jsonData['key'])+'"}')
-        } else if (key === "confirmed"){
-          window.confirmed = true;
-        } else if (key === "uu"){
-          addResultAccount(jsonData['k'], jsonData['v']);
-        } else if (key === "authorized"){
-          addResultAccount("user_id", jsonData['id']);
-          setTimeout(() => {
-            sendMessage("friend_list");
-          }, 1000);
-        } else if (key === "fl_update"){
-          let user = jsonData['user'];
-          addResultFriends(user['id'],
-          user['name'],
-            user['avatar'],
-            user['frame'],
-            user['score'],
-            user['achieve'],
-            jsonData['kind'],
-            jsonData['new']
-          );
-        } else if (key === "err"){
-          alert("err "+ jsonData['code']);
-        }
-      }
-
-    };
-
-    window.socket.onclose = function () {
-      console.log("Соединение закрыто.");
-      setTimeout(function() {
-        connect();
-      }, 1000);
-    };
-
-    window.socket.onerror = function (error) {
-      console.log("Ошибка WebSocket:", error);
-      window.socket.close();
-    };
-  }
-
-  connect();
-
-  function sendMessage(message) {
-    if (window.socket.readyState === WebSocket.OPEN) {
-      if (message.includes("{")) {
-        window.socket.send(message+"\n");
-
-      } else {
-        window.socket.send(message);
-      }
-      console.log(`Сообщение ${message} отправлено.`);
-    } else {
-      console.log("Соединение еще не установлено.");
-
+    function generateAndroidHash(signKey) {
+        const hash = CryptoJS.MD5(signKey + "kdusyfngbfydtsttstcnsjsjdflflfl");
+        return CryptoJS.enc.Base64.stringify(hash);
     }
-  }
 
-  function closeConnection() {
-    window.socket.close();
-  }
-  function authorize(token){
-    if (window.confirmed) {
-      sendMessage('auth{"token":"'+token+'"}');
+    function connect() {
+        window.socket = new WebSocket('wss://durak-replica.rstgames.com/ws3');
+        window.socket.onopen = function () {
+            console.log("Соединение установлено");
+            sendMessage("c{\"tz\":\"+00:00\", \"t\":\"" + new Date().toISOString() + "\", \"l\":\"ru\", \"p\":14, \"pl\":\"web\", \"d\":\"web\", \"v\":\"1.9.8\", \"n\":\"durak.web\"}")
+
+        };
+
+        window.socket.onmessage = function (event) {
+            console.log("Получено сообщение:", event.data);
+            const decodedData = event.data
+            const packets = decodedData.split("\n");
+
+            for (let packet of packets) {
+                let key = packet;
+                let jsonData = null;
+                const jsonIndex = packet.indexOf("{");
+
+                if (jsonIndex !== -1) {
+                    key = packet.substring(0, jsonIndex);
+                    try {
+                        jsonData = JSON.parse(packet.substring(jsonIndex));
+                    } catch (error) {
+                        console.error("Ошибка с загрузкой JSON");
+                        return;
+                    }
+                }
+                if (key === "sign") {
+                    sendMessage('sign{"hash":"' + generateAndroidHash(jsonData['key']) + '"}')
+                } else if (key === "confirmed") {
+                    window.confirmed = true;
+                } else if (key === "uu") {
+                    addResultAccount(jsonData['k'], jsonData['v']);
+                } else if (key === "authorized") {
+                    window.authorized = true;
+                    addResultAccount("user_id", jsonData['id']);
+                    setTimeout(() => {
+                        sendMessage("friend_list");
+                    }, 1000);
+                } else if (key === "fl_update") {
+                    let user = jsonData['user'];
+                    addResultFriends(user['id'],
+                        user['name'],
+                        user['avatar'],
+                        user['frame'],
+                        user['score'],
+                        user['achieve'],
+                        jsonData['kind'],
+                        jsonData['new']
+                    );
+                } else if (key === "err") {
+                    alert("err " + jsonData['code']);
+                } else if (key === "user_info"){
+                    addUserToTable(jsonData);
+                }
+            }
+
+        };
+
+        window.socket.onclose = function () {
+            console.log("Соединение закрыто.");
+            setTimeout(function () {
+                connect();
+            }, 1000);
+        };
+
+        window.socket.onerror = function (error) {
+            console.log("Ошибка WebSocket:", error);
+            window.socket.close();
+        };
     }
-    clearTableAccount();
-    clearTableFriends();
-  }
 
-  function addResultAccount(key,value) {
-    const tableBody = document.getElementById("dataTableAccount").getElementsByTagName("tbody")[0];
+    connect();
 
-    // Создаем новую строку в таблице
-    const row = tableBody.insertRow();
+    function sendMessage(message) {
+        if (window.socket.readyState === WebSocket.OPEN) {
+            if (message.includes("{")) {
+                window.socket.send(message + "\n");
 
-    // Добавляем ячейки в строку
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
+            } else {
+                window.socket.send(message);
+            }
+            console.log(`Сообщение ${message} отправлено.`);
+        } else {
+            console.log("Соединение еще не установлено.");
 
-    // Заполняем ячейки данными
-    cell1.textContent = key;
-    cell2.textContent = value;
-  }
+        }
+    }
 
-  function clearTableAccount() {
-    const tableBody = document.getElementById("dataTableAccount").getElementsByTagName("tbody")[0];
-    tableBody.innerHTML = ""; // Очистка содержимого таблицы
-  }
+    function searchUser(userId) {
+        clearTableUser();
+        if (window.authorized) {
+            sendMessage('get_user_info{"id": '+userId+'}');
+        }
+    }
 
-  function clearTableFriends() {
-    const tableBody = document.getElementById("dataTableFriends").getElementsByTagName("tbody")[0];
-    tableBody.innerHTML = ""; // Очистка содержимого таблицы
-  }
+    function closeConnection() {
+        window.socket.close();
+    }
 
-  function addResultFriends(user_id, name, avatar, frame, score, achieve, kind, isNew) {
-    const tableBody = document.getElementById("dataTableFriends").getElementsByTagName("tbody")[0];
+    function authorize(token) {
+        if (window.confirmed) {
+            sendMessage('auth{"token":"' + token + '"}');
+        }
+        clearTableAccount();
+        clearTableFriends();
+    }
 
-    // Создаем новую строку
-    const row = tableBody.insertRow();
+    function addResultAccount(key, value) {
+        const tableBody = document.getElementById("dataTableAccount").getElementsByTagName("tbody")[0];
 
-    // Добавляем ячейки в строку
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const cell3 = row.insertCell(2);
-    const cell4 = row.insertCell(3);
-    const cell5 = row.insertCell(4);
-    const cell6 = row.insertCell(5);
-    const cell7 = row.insertCell(6);
-    const cell8 = row.insertCell(7);
+        // Создаем новую строку в таблице
+        const row = tableBody.insertRow();
 
-    // Заполняем ячейки
-    cell1.textContent = user_id;
-    cell2.textContent = name;
+        // Добавляем ячейки в строку
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
 
-    // Добавляем изображение в ячейку avatar
-    const img = document.createElement("img");
-    img.src = avatar;
-    img.classList.add("avatar");
-    cell3.appendChild(img);
+        // Заполняем ячейки данными
+        cell1.textContent = key;
+        cell2.textContent = value;
+    }
 
-    cell4.textContent = frame;
-    cell5.textContent = score;
-    cell6.textContent = achieve;
-    cell7.textContent = kind;
-    cell8.textContent = isNew;
-    cell8.classList.add(isNew);
-  }
+    function clearTableAccount() {
+        const tableBody = document.getElementById("dataTableAccount").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ""; // Очистка содержимого таблицы
+    }
 
+    function clearTableFriends() {
+        const tableBody = document.getElementById("dataTableFriends").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ""; // Очистка содержимого таблицы
+    }
+
+    function clearTableUser() {
+        const tableBody = document.getElementById("userTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ""; // Очистка содержимого таблицы
+    }
+
+    function addResultFriends(user_id, name, avatar, frame, score, achieve, kind, isNew) {
+        const tableBody = document.getElementById("dataTableFriends").getElementsByTagName("tbody")[0];
+
+        // Создаем новую строку
+        const row = tableBody.insertRow();
+
+        // Добавляем ячейки в строку
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+        const cell4 = row.insertCell(3);
+        const cell5 = row.insertCell(4);
+        const cell6 = row.insertCell(5);
+        const cell7 = row.insertCell(6);
+        const cell8 = row.insertCell(7);
+
+        // Заполняем ячейки
+        cell1.textContent = user_id;
+        cell2.textContent = name;
+
+        // Добавляем изображение в ячейку avatar
+        const img = document.createElement("img");
+        img.src = avatar;
+        img.classList.add("avatar");
+        cell3.appendChild(img);
+
+        cell4.textContent = frame;
+        cell5.textContent = score;
+        cell6.textContent = achieve;
+        cell7.textContent = kind;
+        cell8.textContent = isNew;
+        cell8.classList.add(isNew);
+    }
+
+    function addUserToTable(user) {
+        const tableBody = document.querySelector("#userTable tbody");
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td><img src="${user.avatar}" alt="Avatar" width="50"></td>
+                <td>${user.wins}</td>
+                <td>${user.points_win}</td>
+                <td>${user.score}</td>
+                <td>${new Date(user.dtp).toLocaleString()}</td>
+            `;
+
+        tableBody.appendChild(row);
+    }
 </script>
 </body>
 </html>
