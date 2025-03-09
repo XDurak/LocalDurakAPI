@@ -30,9 +30,6 @@
     td {
       background-color: #f9f9f9;
     }
-    .undefined {
-      color: red;
-    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
@@ -162,6 +159,8 @@
             jsonData['kind'],
             jsonData['new']
           );
+        } else if (key === "err"){
+          alert("err "+ jsonData['code']);
         }
       }
 
@@ -205,6 +204,7 @@
       sendMessage('auth{"token":"'+token+'"}');
     }
     clearTableAccount();
+    clearTableFriends();
   }
 
   function addResultAccount(key,value) {
@@ -220,7 +220,6 @@
     // Заполняем ячейки данными
     cell1.textContent = key;
     cell2.textContent = value;
-
   }
 
   function clearTableAccount() {
