@@ -36,8 +36,11 @@
             background-color: #f9f9f9;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
 
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 </head>
 <body>
 <label>
@@ -133,6 +136,7 @@
 
 
 <script>
+    window.userTable = new DataTable("#userTable");
     document.addEventListener("DOMContentLoaded", function () {
         const radioButtons = document.querySelectorAll('input[name="mode"]');
         const modeContents = document.querySelectorAll('.mode-content');
@@ -275,23 +279,22 @@
     }
 
     function addUserToTable(user) {
-        const tableBody = document.querySelector("#userTable tbody");
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-        <td>${user.id}</td>
-        <td>${user.name}</td>
-        <td><img src="${user.avatar}" alt="Avatar" width="50"></td>
-        <td>${user.wins}</td>
-        <td>${user.wins_s || 0}</td>
-        <td>${user.points_win}</td>
-        <td>${user.points_win_s || 0}</td>
-        <td>${user.score}</td>
-        <td>${user.score_s || 0}</td>
-        <td>${new Date(user.dtp).toLocaleString()}</td>
-    `;
-
-        tableBody.appendChild(row);
+        let image = "❌";
+        if (user.avatar) {
+            image = `<img src="${user.avatar}" alt="Avatar" width="50">`
+        }
+        window.userTable.row.add([
+            user.id,
+            user.name,
+            image,
+            user.wins,
+            user.wins_s || 0,
+            user.points_win,
+            user.points_win_s || 0,
+            user.score,
+            user.score_s || 0,
+            new Date(user.dtp).toLocaleString()
+        ]).draw(false);
     }
 
     function closeConnection() {
@@ -332,8 +335,7 @@
     }
 
     function clearTableUser() {
-        const tableBody = document.getElementById("userTable").getElementsByTagName("tbody")[0];
-        tableBody.innerHTML = ""; // Очистка содержимого таблицы
+        window.userTable.clear().draw();
     }
 
     function addResultFriends(user_id, name, avatar, frame, score, achieve, kind, isNew) {
