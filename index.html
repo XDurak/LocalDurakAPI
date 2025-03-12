@@ -117,8 +117,11 @@
             <th>Name</th>
             <th>Avatar</th>
             <th>Wins</th>
+            <th>Wins_S</th>
             <th>Points Win</th>
+            <th>Points Win_S</th>
             <th>Score</th>
+            <th>Score_S</th>
             <th>Time Registration</th>
         </tr>
         </thead>
@@ -280,8 +283,11 @@
         <td>${user.name}</td>
         <td><img src="${user.avatar}" alt="Avatar" width="50"></td>
         <td>${user.wins}</td>
+        <td>${user.wins_s || 0}</td>
         <td>${user.points_win}</td>
+        <td>${user.points_win_s || 0}</td>
         <td>${user.score}</td>
+        <td>${user.score_s || 0}</td>
         <td>${new Date(user.dtp).toLocaleString()}</td>
     `;
 
