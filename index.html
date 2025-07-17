@@ -161,7 +161,7 @@
     }
 
     function connect() {
-        window.socket = new WebSocket('wss://durak-replica.rstgames.com/ws3');
+        window.socket = new WebSocket('wss://durak.rstgames.com/ws3');
         window.socket.onopen = function () {
             console.log("Соединение установлено");
             sendMessage("c{\"tz\":\"+00:00\", \"t\":\"" + new Date().toISOString() + "\", \"l\":\"ru\", \"p\":14, \"pl\":\"web\", \"d\":\"web\", \"v\":\"1.9.8\", \"n\":\"durak.web\"}")
